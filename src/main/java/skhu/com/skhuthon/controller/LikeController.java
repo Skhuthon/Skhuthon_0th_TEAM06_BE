@@ -22,7 +22,7 @@ public class LikeController {
         return "좋아요 추가";
     }
 
-    @DeleteMapping ("/{id}")
+    @DeleteMapping("/{id}")
     public String deleteLike(@PathVariable("id") Long id) {
         likeService.deleteLike(id);
         return "삭제 완료";

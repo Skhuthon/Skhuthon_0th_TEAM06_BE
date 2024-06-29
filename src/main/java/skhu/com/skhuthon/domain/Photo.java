@@ -34,8 +34,14 @@ public class Photo {
     @Column(name = "photo_title")
     private String title;
 
-    @Column(name = "photo_path")
+    @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "photo_imagePath")
     private String imagePath;
+
+    @Column(name = "photo_audioPath")
+    private String audioPath;
 
     @Column(name = "like_count")
     private int likeCount = DEFAULT_LIKE_NUM;
@@ -44,10 +50,15 @@ public class Photo {
     @JsonIgnore
     private List<Like> likes = new ArrayList<>();
 
-    public void increaseLikeCount(){
+    @OneToMany(mappedBy = "photo")
+    @JsonIgnore
+    private List<User> users = new ArrayList<>();
+
+    public void increaseLikeCount() {
         this.likeCount++;
     }
-    public void decreaseLikeCount(){
+
+    public void decreaseLikeCount() {
         this.likeCount--;
     }
 }

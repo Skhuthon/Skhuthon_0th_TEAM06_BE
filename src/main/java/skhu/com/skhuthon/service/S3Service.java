@@ -18,9 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +34,7 @@ public class S3Service {
     private String bucketName;
 
     public String upload(MultipartFile image) {
-        if(image.isEmpty() || Objects.isNull(image.getOriginalFilename())){
+        if (image.isEmpty()) {
             throw new IllegalArgumentException("사진이 없습니다.");
         }
         return this.uploadImage(image);
@@ -59,11 +56,6 @@ public class S3Service {
         }
 
         String extention = filename.substring(lastDotIndex + 1).toLowerCase();
-        List<String> allowedExtentionList = Arrays.asList("jpg", "jpeg", "png", "gif");
-
-        if (!allowedExtentionList.contains(extention)) {
-            throw new IllegalArgumentException("부정확한 확장자입니다.");
-        }
     }
 
     private String uploadImageToS3(MultipartFile image) throws IOException {
@@ -80,14 +72,14 @@ public class S3Service {
         metadata.setContentLength(bytes.length);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 
-        try{
+        try {
             PutObjectRequest putObjectRequest =
                     new PutObjectRequest(bucketName, s3FileName, byteArrayInputStream, metadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3.putObject(putObjectRequest); // put image to S3
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException("s3업로드 오류 발생.");
-        }finally {
+        } finally {
             byteArrayInputStream.close();
             is.close();
         }
@@ -95,21 +87,21 @@ public class S3Service {
         return amazonS3.getUrl(bucketName, s3FileName).toString();
     }
 
-    public void deleteImageFromS3(String imageAddress){
+    public void deleteImageFromS3(String imageAddress) {
         String key = getKeyFromImageAddress(imageAddress);
-        try{
+        try {
             amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException("삭제 중 문제 발생");
         }
     }
 
-    private String getKeyFromImageAddress(String imageAddress){
-        try{
+    private String getKeyFromImageAddress(String imageAddress) {
+        try {
             URL url = new URL(imageAddress);
             String decodingKey = URLDecoder.decode(url.getPath(), "UTF-8");
             return decodingKey.substring(1); // 맨 앞의 '/' 제거
-        }catch (MalformedURLException | UnsupportedEncodingException e){
+        } catch (MalformedURLException | UnsupportedEncodingException e) {
             throw new IllegalArgumentException("삭제 중 문제 발생");
         }
     }
